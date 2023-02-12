@@ -36,7 +36,7 @@ GPIO.output(20, GPIO.LOW)
 
 # camera
 camera_resolution = [640, 480]
-camera_type = 1 # PiCamera: 0 | USB Webcam: 1
+camera_type = 0 # PiCamera: 0 | USB Webcam: 1
 if camera_type == 0:
     try:
         from picamera import PiCamera
