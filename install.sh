@@ -1,11 +1,11 @@
 #!/bin/bash
-echo -e "\n***************************************************\n*   __   ___            __   __  ___  __     __   *\n*  |__) |__  |__|  /\  |__) /  \  |   __|   |  |  *\n*  |  \ |___ |  | /--\ |__) \__/  |  |__  . |__|  *\n*                                                 *\n*  v1.0.1                                         *\n***************************************************\n\n"
+echo -e "\n***************************************************\n*   __   ___            __   __  ___  __     __   *\n*  |__) |__  |__|  /\  |__) /  \  |   __|   |  |  *\n*  |  \ |___ |  | /--\ |__) \__/  |  |__  . |__|  *\n*                                                 *\n*  v1.1.0                                         *\n***************************************************\n\n"
 
 echo -e "Installing required libraries ...\n"
 sudo apt-get update -y && sudo apt-get upgrade -y
-sudo apt-get install -y nitrogen libhdf5-dev libhdf5-serial-dev python3-pyqt5 libatlas-base-dev libjasper-dev python3-pil.imagetk libasound2-dev
+sudo apt-get install -y nitrogen bluetooth bluez blueman libhdf5-dev libhdf5-serial-dev python3-pyqt5 libatlas-base-dev libjasper-dev python3-pil.imagetk libasound2-dev python3-scipy
 sudo pip3 install --upgrade pip setuptools wheel numpy
-sudo pip3 install pyalsaaudio opencv-python==4.5.3.56 opencv-contrib-python==4.5.3.56 
+sudo pip3 install pyalsaaudio opencv-python==4.5.3.56 opencv-contrib-python==4.5.3.56 pandas scipy 
 echo -e "[SUCCESS]  Installed required libraries\n"
 
 echo -e "Installing touchscreen driver ...\n"

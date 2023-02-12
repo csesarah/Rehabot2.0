@@ -3,7 +3,7 @@ __author       = "Chen Si-En, Sarah"
 __copyright    = "Copyright 2021, Chen Si-En, Sarah"
 
 __description  = "Global parameters for Rehabot 2.0"
-__version      = "1.0.1"
+__version      = "1.1.0"
 __status       = "Production"
 __dependencies = "pygame, alsaaudio" 
 '''
@@ -20,12 +20,13 @@ def init():
     '''
 
     ## global parameters to be shared
-    global camera_status, robot_status, \
+    global camera_status, robot_status, imu1_status, imu2_status, \
             camera, camera_resolution, \
             robot, trackerFollower, \
             play_button_state, startFlag, stop_trackerFollower, \
             bpm, lang, volume, language, gui_lang, lang, \
-            cue, encouragement, beep, tick, mixer, speaker_mixer
+            cue, encouragement, beep, tick, mixer, speaker_mixer, \
+            recordIMU, stop_recordStream
     
     # audio files
     cue = glob.glob('rsc/audio/en_cue-*.wav')
@@ -48,17 +49,28 @@ def init():
     lang = 0
     startFlag = 0
     stop_trackerFollower = False
+    stop_recordStream = False
     
     # default language
     language = 'ENGLISH'
     gui_lang = {
-        "settings": "Settings",
-        "language": "Language",
-        "volume": "Volume",
-        "metronome": "Metronome",
-        "back": "Back",
-        "start": "Start",
-        "stop": "Stop"
-    }
-    
+                "settings": "Settings",
+                "language": "Language",
+                "records" : "Records",
+                "volume": "Volume",
+                "metronome": "Metronome",
+                "back": "Back",
+                "start": "Start",
+                "stop": "Stop",
+                "previous_session" : "Previous Session",
+                "session_history" : "Session History",
+                "delete" : "Delete",
+                "session_date" : "Session Date\n(DD/MM/YYYY)",
+                "duration": "Duration",
+                "duration_units": "min",
+                "cadence": "Cadence",
+                "cadence_units": "steps/min",
+                "stride_time": "Stride\nTime",
+                "stride_time_units": "s",
+            }
     

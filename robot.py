@@ -3,7 +3,7 @@ __author       = "Chen Si-En, Sarah"
 __copyright    = "Copyright 2021, Chen Si-En, Sarah"
 
 __description  = "Functions for wheeled robot ArUco marker follower with timed audio cues"
-__version      = "1.0.1"
+__version      = "1.1.0"
 __status       = "Production"
 __dependencies = "cv2, numpy, global_params.py"
 '''
@@ -11,10 +11,9 @@ __dependencies = "cv2, numpy, global_params.py"
 import cv2
 import cv2.aruco as aruco
 import numpy as np
-import time
+from time import time
 from random import randint
 import global_params
-
 
 def loadMtx(path):
     ''' GETS CALIBRATION MATRIX FROM .TXT FILE GENERATED FROM CV2 CALIBRATION
@@ -52,7 +51,7 @@ def trackerFollower_picamera(camera, camera_resolution, robot, cue, encouragemen
 
     # timing
     stop_flag = 1
-    robotStop_start_time = time.time() # start counting time when robot is stopped
+    robotStop_start_time = time() # start counting time when robot is stopped
 
     # main
     from picamera.array import PiRGBArray
@@ -67,11 +66,11 @@ def trackerFollower_picamera(camera, camera_resolution, robot, cue, encouragemen
 
         if (cue_play_flag == 1):
             cue_play_flag = 0
-            robotStop_start_time = time.time() # reset robotStop_start_time to 0
+            robotStop_start_time = time() # reset robotStop_start_time to 0
 
         if (encouragement_play_flag == 1):
             encouragement_play_flag = 0
-            encouragement_start_time = time.time()
+            encouragement_start_time = time()
 
         # frame operations
         gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
@@ -99,18 +98,22 @@ def trackerFollower_picamera(camera, camera_resolution, robot, cue, encouragemen
 
             # robot
             stop_flag = 0
-            robotStop_start_time = time.time() # reset robotStop_start_time to 0
+            robotStop_start_time = time() # reset robotStop_start_time to 0
             if (ids[i][0] == 0):
                 robot.forward()
             elif (ids[i][0] == 1):
                 robot.backward()
 
+            print(str(time())+',1,,')
+
         else:
             stop_flag = 1
-            robotStop_end_time = time.time()
+            robotStop_end_time = time()
             robotStop_time_elasped = robotStop_end_time - robotStop_start_time
 
             robot.stop()
+
+            print(str(time())+',0,,')
 
         # audio cues
         cue_time_thres = 3.0
@@ -121,7 +124,7 @@ def trackerFollower_picamera(camera, camera_resolution, robot, cue, encouragemen
         encouragement_time_thres = 1.0
         if (robotStop_time_elasped < encouragement_time_thres and stop_flag == 0):
             try:
-                if (abs(encouragement_start_time - time.time()) > 3.0):
+                if (abs(encouragement_start_time - time()) > 3.0):
                     global_params.mixer.Sound(encouragement[randint(0, len(global_params.encouragement)-1)]).play()
                     encouragement_play_flag = 1
             except:
@@ -130,6 +133,7 @@ def trackerFollower_picamera(camera, camera_resolution, robot, cue, encouragemen
 
         # openCV truncate to prevent resolution buffer length error
         rawCapture.truncate(0)
+        
 
 def trackerFollower_webcam(camera, camera_resolution, robot, cue, encouragement, stop_trackerFollower):
     ''' FUNCTION TO TRACK ARUCO MARKERS AND ACTIVATE GPIO ROBOT MOVEMENT 
@@ -150,7 +154,7 @@ def trackerFollower_webcam(camera, camera_resolution, robot, cue, encouragement,
 
     # timing
     stop_flag = 1
-    robotStop_start_time = time.time() # start counting time when robot is stopped
+    robotStop_start_time = time() # start counting time when robot is stopped
 
     while(True):
         # read each frame from camera
@@ -161,11 +165,11 @@ def trackerFollower_webcam(camera, camera_resolution, robot, cue, encouragement,
 
         if (cue_play_flag == 1):
             cue_play_flag = 0
-            robotStop_start_time = time.time() # reset robotStop_start_time to 0
+            robotStop_start_time = time() # reset robotStop_start_time to 0
 
         if (encouragement_play_flag == 1):
             encouragement_play_flag = 0
-            encouragement_start_time = time.time()
+            encouragement_start_time = time()
 
         # frame operations
         gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
@@ -193,18 +197,21 @@ def trackerFollower_webcam(camera, camera_resolution, robot, cue, encouragement,
 
             # robot
             stop_flag = 0
-            robotStop_start_time = time.time() # reset robotStop_start_time to 0
+            robotStop_start_time = time() # reset robotStop_start_time to 0
             if (ids[i][0] == 0):
                 robot.forward()
             elif (ids[i][0] == 1):
                 robot.backward()
+
+            print(str(time())+',1,,')
                 
         else:
             stop_flag = 1
-            robotStop_end_time = time.time()
+            robotStop_end_time = time()
             robotStop_time_elasped = robotStop_end_time - robotStop_start_time
 
             robot.stop()
+            print(str(time())+',0,,')
 
         # audio cues
         cue_time_thres = 3.0
@@ -215,7 +222,7 @@ def trackerFollower_webcam(camera, camera_resolution, robot, cue, encouragement,
         encouragement_time_thres = 1.0
         if (robotStop_time_elasped < encouragement_time_thres and stop_flag == 0):
             try:
-                if (abs(encouragement_start_time - time.time()) > 3.0):
+                if (abs(encouragement_start_time - time()) > 3.0):
                     global_params.mixer.Sound(encouragement[randint(0, len(global_params.encouragement)-1)]).play()
                     encouragement_play_flag = 1
             except:
