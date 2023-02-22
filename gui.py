@@ -862,7 +862,7 @@ class appGUI(object):
         
         self.lang_select_val.set('Language Selected: ' + global_params.language)
 
-        self.sensitivity_level_val.set(global_params.gui_lang['sensitivity'])
+        self.sensitivity_button.configure(text=global_params.gui_lang['sensitivity'])
         self.sensitivity_desc_val.set(global_params.gui_lang['sensitivity_desc'])
 
         return global_params.lang, global_params.language, global_params.cue, global_params.encouragement, global_params.gui_lang
