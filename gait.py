@@ -3,7 +3,7 @@ __author       = "Chen Si-En, Sarah"
 __copyright    = "Copyright 2021, Chen Si-En, Sarah"
 
 __description  = "Functions for calculating gait parameters"
-__version      = "1.1.0"
+__version      = "1.2.0"
 __status       = "Production"
 __dependencies = "pandas, scipy, global_params.py"
 '''

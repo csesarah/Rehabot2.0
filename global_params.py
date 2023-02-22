@@ -3,7 +3,7 @@ __author       = "Chen Si-En, Sarah"
 __copyright    = "Copyright 2021, Chen Si-En, Sarah"
 
 __description  = "Global parameters for Rehabot 2.0"
-__version      = "1.1.0"
+__version      = "1.2.0"
 __status       = "Production"
 __dependencies = "pygame, alsaaudio" 
 '''
@@ -26,7 +26,8 @@ def init():
             play_button_state, startFlag, stop_trackerFollower, \
             bpm, lang, volume, language, gui_lang, lang, \
             cue, encouragement, beep, tick, mixer, speaker_mixer, \
-            recordIMU, stop_recordStream
+            recordIMU, stop_recordStream, \
+            sensitivity_level
     
     # audio files
     cue = glob.glob('rsc/audio/en_cue-*.wav')
@@ -44,6 +45,9 @@ def init():
     # initial volume level setting
     volume = 100
 
+    ## initial sensitivity setting
+    sensitivity_level = 0
+
     # initial flags
     play_button_state = False
     lang = 0
@@ -54,14 +58,14 @@ def init():
     # default language
     language = 'ENGLISH'
     gui_lang = {
-                "settings": "Settings",
-                "language": "Language",
-                "records" : "Records",
-                "volume": "Volume",
-                "metronome": "Metronome",
-                "back": "Back",
-                "start": "Start",
-                "stop": "Stop",
+                "settings" : "Settings",
+                "language" : "Language",
+                "records"  : "Records",
+                "volume" : "Volume",
+                "metronome" : "Metronome",
+                "back" : "Back",
+                "start" : "Start",
+                "stop" : "Stop",
                 "previous_session" : "Previous Session",
                 "session_history" : "Session History",
                 "delete" : "Delete",
@@ -72,5 +76,7 @@ def init():
                 "cadence_units": "steps/min",
                 "stride_time": "Stride\nTime",
                 "stride_time_units": "s",
+                "sensitivity": "Speed",
+                "sensitivity_desc": "Adjust robot speed",
             }
     

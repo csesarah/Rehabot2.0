@@ -1,5 +1,3 @@
-from picamera.array import PiRGBArray
-from picamera import PiCamera
 import cv2
 import cv2.aruco as aruco
 import time
@@ -10,6 +8,7 @@ import glob
 # camera = PiCamera()
 # camera.resolution = (640, 480)
 # camera.framerate = 32
+import time
 
 camera = cv2.VideoCapture(0)
 time.sleep(0.1)
@@ -170,16 +169,20 @@ while(True):
      
              cv2.putText(frame, "Id: " + strg, (0,64), font, 1, (0,255,0),2,cv2.LINE_AA)
              
+            print(str(int(time.time()))+',1')
+
         else:
              # code to show 'No Ids' when no markers are found
              cv2.putText(frame, "No Ids", (0,64), font, 1, (0,255,0),2,cv2.LINE_AA)
+
+             print(str(int(time.time()))+',0')
+
         # display the resulting frame
         cv2.imshow('frame',frame)
        
        # terminate
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
-            
             
 
 # When everything done, release the capture

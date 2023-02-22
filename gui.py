@@ -3,7 +3,7 @@ __author       = "Chen Si-En, Sarah"
 __copyright    = "Copyright 2021, Chen Si-En, Sarah"
 
 __description  = "GUI for controlling robot from touchscreen input"
-__version      = "1.1.0"
+__version      = "1.2.0"
 __status       = "Production"
 __dependencies = "tkinter, global_params.py"
 '''
@@ -186,6 +186,50 @@ class appGUI(object):
                                       self.volume_button_photo, \
                                       self.VolumeMenu)
         
+        #### Sensitivity Menu Button
+        self.sensitivity_button_photo = btnImage('./rsc/img/icon_sensitivity.png', btn_icon_size)
+        self.sensitivity_button = appButton(root, \
+                                      global_params.gui_lang["sensitivity"], \
+                                      self.sensitivity_button_photo, \
+                                      self.SensitivityMenu)
+        
+        #### Sensitivity Setting
+        self.sensitivity_setting = tk.Frame(root, bg=background_color)
+
+        #### Decrease Sensitivity Button
+        self.sensitivity_decrease_button_photo = btnImage('./rsc/img/1x1.png', 10)
+        self.sensitivity_decrease_button = tk.Button(root, \
+            text = "-", \
+            command = self.DecreaseSensitivity, \
+            bg = button_color, activebackground = button_color, activeforeground = highlight_color, \
+            image = self.sensitivity_decrease_button_photo, compound = tk.LEFT, \
+            height = 3*font_size, \
+            width = font_size*3, \
+            font = font.Font(family=font_family, size=2*font_size))
+        
+        #### Increase Sensitivity Button
+        self.sensitivity_increase_button_photo = btnImage('./rsc/img/1x1.png', 10)
+        self.sensitivity_increase_button = tk.Button(root, \
+            text = "+", \
+            command = self.IncreaseSensitivity, \
+            bg = button_color, activebackground = button_color, activeforeground = highlight_color, \
+            image = self.sensitivity_increase_button_photo, compound = tk.LEFT, \
+            height = 3*font_size, \
+            width = font_size*3, \
+            font = font.Font(family=font_family, size=2*font_size))
+        
+        #### Display Sensitivity Level Label
+        self.sensitivity_level_val = tk.StringVar()
+        self.sensitivity_level_val.set(str(global_params.sensitivity_level+1))
+        self.sensitivity_level_label = tk.Label(root, textvariable=self.sensitivity_level_val, \
+                                       bg=background_color, font = font.Font(family=font_family, size=int(4*font_size)))
+
+        #### Display Sensitivity Level Label
+        self.sensitivity_desc_val = tk.StringVar()
+        self.sensitivity_desc_val.set(global_params.gui_lang["sensitivity_desc"])
+        self.sensitivity_desc_label = tk.Label(root, textvariable=self.sensitivity_desc_val, \
+                                       bg=background_color, font = font.Font(family=font_family, size=int(0.8*font_size)))
+
         #### Select Language 1 Button
         self.language_1_button_photo = btnImage('./rsc/img/1x1.png', 10)
         self.language_1_button = appButton(root, \
@@ -401,6 +445,7 @@ class appGUI(object):
         ## menu gui elements
         self.language_button.pack(pady=10)
         self.volume_button.pack(pady=10)
+        self.sensitivity_button.pack(pady=10)
         self.return_button.pack(pady=10)
 
     def RecordsMenu(self):
@@ -508,6 +553,25 @@ class appGUI(object):
         self.volume_slider.pack(pady=10)
         self.return_settings_button.pack(pady=10)
 
+    def SensitivityMenu(self):
+        ''' DISPLAY SENSITIVITY MENU ON CANVAS
+            
+        '''
+
+        ## play beep when screen changes
+        global_params.mixer.Sound(global_params.beep).play()
+        
+        ## remove all gui elements currently on screen
+        self.RemoveAll()
+
+        ## menu gui elements
+        self.sensitivity_desc_label.pack(side=tk.TOP, padx=10, pady=10)
+        self.sensitivity_setting.pack(side=tk.TOP, padx=10, pady=10)
+        self.sensitivity_decrease_button.pack(in_=self.sensitivity_setting, side=tk.LEFT, fill=None, padx=10)
+        self.sensitivity_level_label.pack(in_=self.sensitivity_setting, side=tk.LEFT, fill=tk.BOTH, padx=30)
+        self.sensitivity_increase_button.pack(in_=self.sensitivity_setting, side=tk.RIGHT, fill=None, padx=10)
+        self.return_settings_button.pack(pady=10)
+
     def MetronomeMenu(self):
         ''' DISPLAY METRONOME MENU ON CANVAS
             
@@ -560,6 +624,7 @@ class appGUI(object):
             self.records_table,
             self.delete_records_button,
             self.volume_button,
+            self.sensitivity_button,
             self.language_1_button,
             self.language_2_button,
             self.language_label,
@@ -568,6 +633,11 @@ class appGUI(object):
             self.metronome_slider,
             self.volume_image_button,
             self.volume_slider,
+            self.sensitivity_setting,
+            self.sensitivity_level_label,
+            self.sensitivity_desc_label,
+            self.sensitivity_decrease_button,
+            self.sensitivity_increase_button,
             self.return_button,
             self.return_settings_button,
         ]
@@ -608,7 +678,8 @@ class appGUI(object):
                                  args=(global_params.camera, global_params.camera_resolution, \
                                        global_params.robot, \
                                        global_params.cue, global_params.encouragement, \
-                                       global_params.stop_trackerFollower, ) \
+                                       global_params.stop_trackerFollower, \
+                                       global_params.sensitivity_level,) \
                                 )
             t.start()
 
@@ -734,6 +805,8 @@ class appGUI(object):
                 "cadence_units": "steps/min",
                 "stride_time": "Stride\nTime",
                 "stride_time_units": "s",
+                "sensitivity": "Speed",
+                "sensitivity_desc": "Adjust robot speed",
             }
         elif lang == 1:
             global_params.cue = glob.glob('rsc/audio/cn_cue-*.wav')
@@ -759,6 +832,8 @@ class appGUI(object):
                 "cadence_units": "步数/分钟",
                 "stride_time": "步幅\n时间",
                 "stride_time_units": "秒钟",
+                "sensitivity": "速度",
+                "sensitivity_desc": "调整机器人速度",
             }
 
         ## changes gui elements to display in selected language
@@ -786,6 +861,9 @@ class appGUI(object):
         self.records_table.heading("stride_time",text=global_params.gui_lang["stride_time"]+" ("+global_params.gui_lang["stride_time_units"]+")")
         
         self.lang_select_val.set('Language Selected: ' + global_params.language)
+
+        self.sensitivity_level_val.set(global_params.gui_lang['sensitivity'])
+        self.sensitivity_desc_val.set(global_params.gui_lang['sensitivity_desc'])
 
         return global_params.lang, global_params.language, global_params.cue, global_params.encouragement, global_params.gui_lang
 
@@ -850,3 +928,38 @@ class appGUI(object):
 
         global_params.speaker_mixer.setvolume(global_params.volume)
 
+    def IncreaseSensitivity(self):
+        ''' INCREASE SENSITIVITY
+        Args:
+            sensitivity_level      : (int, required)  Given sensitivity level integer.
+        
+        Returns:
+            
+        '''
+        
+        MAX_SENSITIVITY_LEVEL = 7
+        if global_params.sensitivity_level == MAX_SENSITIVITY_LEVEL:
+            global_params.sensitivity_level = MAX_SENSITIVITY_LEVEL
+        else:
+            global_params.sensitivity_level += 1
+        
+        self.sensitivity_level_val.set(str(global_params.sensitivity_level+1))
+        return global_params.sensitivity_level
+    
+    def DecreaseSensitivity(self):
+        ''' DECREASE SENSITIVITY
+        Args:
+            sensitivity_level      : (int, required)  Given sensitivity level integer.
+        
+        Returns:
+            
+        '''
+        
+        MIN_SENSITIVITY_LEVEL = 0
+        if global_params.sensitivity_level == MIN_SENSITIVITY_LEVEL:
+            global_params.sensitivity_level = MIN_SENSITIVITY_LEVEL
+        else:
+            global_params.sensitivity_level -= 1
+        
+        self.sensitivity_level_val.set(str(global_params.sensitivity_level+1))
+        return global_params.sensitivity_level

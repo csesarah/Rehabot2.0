@@ -3,7 +3,7 @@ __author       = "Chen Si-En, Sarah"
 __copyright    = "Copyright 2021, Chen Si-En, Sarah"
 
 __description  = "Functions for wheeled robot ArUco marker follower with timed audio cues"
-__version      = "1.1.0"
+__version      = "1.2.0"
 __status       = "Production"
 __dependencies = "cv2, numpy, global_params.py"
 '''
@@ -34,7 +34,7 @@ def loadMtx(path):
 # get calib mtx
 [mtx, dist] = loadMtx('calib.txt')
 
-def trackerFollower_picamera(camera, camera_resolution, robot, cue, encouragement, stop_trackerFollower):
+def trackerFollower_picamera(camera, camera_resolution, robot, cue, encouragement, stop_trackerFollower, sensitivity):
     ''' FUNCTION TO TRACK ARUCO MARKERS AND ACTIVATE GPIO ROBOT MOVEMENT 
     Args:
             camera                : (camera obj,   required) Either Pi camera or webcam object based on setting in main.py
@@ -42,7 +42,8 @@ def trackerFollower_picamera(camera, camera_resolution, robot, cue, encouragemen
             robot                 : (robot obj,    required) GPIO robot created in main.py
             cue                   : (arr,          required) List of audio cue files available.
             encouragement         : (arr,          required) List of audio encouragment files available.
-            stop_trackerFollower  : (bool,         required) 
+            stop_trackerFollower  : (bool,         required) Whether to stop camera tracking and robot
+            sensitivity           : (int,          required) Sensitivity setting of robot
     '''
     
     # audio flags
@@ -56,6 +57,10 @@ def trackerFollower_picamera(camera, camera_resolution, robot, cue, encouragemen
     # main
     from picamera.array import PiRGBArray
     rawCapture = PiRGBArray(camera, size=(camera_resolution[0], camera_resolution[1]))
+
+    SENSITIVITY = sensitivity * 10
+    spd = 0 
+    prev_robot_direction = None
 
     for capture in camera.capture_continuous(rawCapture, format="bgr", use_video_port=True):
         # read each frame from camera
@@ -86,7 +91,7 @@ def trackerFollower_picamera(camera, camera_resolution, robot, cue, encouragemen
         corners, ids, rejectedImgPoints = aruco.detectMarkers(gray, aruco_dict, parameters=parameters)
 
         # check if the ids list is not empty if no check is added the code will crash
-        if np.all(ids != None):
+        if np.all(ids != None): # when marker is detected
 
             # estimate pose of each marker and return the values rvet and tvec-different from camera coefficients
             rvec, tvec ,_ = aruco.estimatePoseSingleMarkers(corners, 0.05, mtx, dist)
@@ -101,19 +106,37 @@ def trackerFollower_picamera(camera, camera_resolution, robot, cue, encouragemen
             robotStop_start_time = time() # reset robotStop_start_time to 0
             if (ids[i][0] == 0):
                 robot.forward()
+                prev_robot_direction = 0
             elif (ids[i][0] == 1):
                 robot.backward()
+                prev_robot_direction = 1
 
             print(str(time())+',1,,')
 
-        else:
-            stop_flag = 1
-            robotStop_end_time = time()
-            robotStop_time_elasped = robotStop_end_time - robotStop_start_time
+            spd = SENSITIVITY
+        else: # when marker is not detected
+            # robot
+            if spd != 0:
+                # move robot for every n frames after last detection of marker where n is function of sensitivity
+                stop_flag = 0
+                robotStop_start_time = time() # reset robotStop_start_time to 0
+                if (prev_robot_direction == 0):
+                    robot.forward()
+                elif (prev_robot_direction == 1):
+                    robot.backward()
 
-            robot.stop()
+                print(str(time())+',1,,')
+                 
+                spd -= 1
+            else:
+                stop_flag = 1
+                robotStop_end_time = time()
+                robotStop_time_elasped = robotStop_end_time - robotStop_start_time
 
-            print(str(time())+',0,,')
+                robot.stop()
+
+                print(str(time())+',0,,')
+                    
 
         # audio cues
         cue_time_thres = 3.0
@@ -135,7 +158,7 @@ def trackerFollower_picamera(camera, camera_resolution, robot, cue, encouragemen
         rawCapture.truncate(0)
         
 
-def trackerFollower_webcam(camera, camera_resolution, robot, cue, encouragement, stop_trackerFollower):
+def trackerFollower_webcam(camera, camera_resolution, robot, cue, encouragement, stop_trackerFollower, sensitivity):
     ''' FUNCTION TO TRACK ARUCO MARKERS AND ACTIVATE GPIO ROBOT MOVEMENT 
     Args:
             camera                : (camera obj,   required) Either Pi camera or webcam object based on setting in main.py
@@ -143,7 +166,8 @@ def trackerFollower_webcam(camera, camera_resolution, robot, cue, encouragement,
             robot                 : (robot obj,    required) GPIO robot created in main.py
             cue                   : (arr,          required) List of audio cue files available.
             encouragement         : (arr,          required) List of audio encouragment files available.
-            stop_trackerFollower  : (bool,         required) 
+            stop_trackerFollower  : (bool,         required) Whether to stop camera tracking and robot
+            sensitivity           : (int,          required) Sensitivity setting of robot
     '''
     
     camera_resolution = camera_resolution
@@ -155,6 +179,10 @@ def trackerFollower_webcam(camera, camera_resolution, robot, cue, encouragement,
     # timing
     stop_flag = 1
     robotStop_start_time = time() # start counting time when robot is stopped
+
+    SENSITIVITY = sensitivity * 10
+    spd = 0 
+    prev_robot_direction = None
 
     while(True):
         # read each frame from camera
@@ -200,18 +228,36 @@ def trackerFollower_webcam(camera, camera_resolution, robot, cue, encouragement,
             robotStop_start_time = time() # reset robotStop_start_time to 0
             if (ids[i][0] == 0):
                 robot.forward()
+                prev_robot_direction = 0
             elif (ids[i][0] == 1):
                 robot.backward()
+                prev_robot_direction = 1
 
             print(str(time())+',1,,')
-                
-        else:
-            stop_flag = 1
-            robotStop_end_time = time()
-            robotStop_time_elasped = robotStop_end_time - robotStop_start_time
 
-            robot.stop()
-            print(str(time())+',0,,')
+            spd = SENSITIVITY
+        else: # when marker is not detected
+            # robot
+            if spd != 0:
+                # move robot for every n frames after last detection of marker where n is function of sensitivity
+                stop_flag = 0
+                robotStop_start_time = time() # reset robotStop_start_time to 0
+                if (prev_robot_direction == 0):
+                    robot.forward()
+                elif (prev_robot_direction == 1):
+                    robot.backward()
+
+                print(str(time())+',1,,')
+                 
+                spd -= 1
+            else:
+                stop_flag = 1
+                robotStop_end_time = time()
+                robotStop_time_elasped = robotStop_end_time - robotStop_start_time
+
+                robot.stop()
+
+                print(str(time())+',0,,')
 
         # audio cues
         cue_time_thres = 3.0

@@ -1,5 +1,5 @@
 # Rehabot2.0
-### v1.1.0.20230210
+### v1.2.0.20230222
 
 ---
 
@@ -30,20 +30,24 @@ On fresh install of Raspbian OS,
 
         git clone https://github.com/csesarah/Rehabot2.0 
 
-3. Upload Arduino code 
+3. Connect RPi GPIO pins to L298D motor driver
+    - GPIO pins **6, 13, 19, 26** to driver **input** pins
+    - GPIO pins **16, 20** to driver **enable A and B** pins
 
-4. For IMUs, remember to change ```00:00:00:00:00:00``` in ```appstart.sh``` to MAC addresses of bluetooth IMUs:
+4. Upload Arduino code for IMUs
+
+5. For IMUs, remember to change ```00:00:00:00:00:00``` in ```appstart.sh``` to MAC addresses of bluetooth IMUs:
    
         sudo rfcomm bind rfcomm0 00:00:00:00:00:00
         sudo rfcomm bind rfcomm1 00:00:00:00:00:00
 
-5. Pair bluetooth IMUs with the Bluetooth Manager on Raspberry Pi before continuing
+6. Pair bluetooth IMUs with the Bluetooth Manager on Raspberry Pi before continuing
 
-6. Run ```install.sh``` to install all necessary prerequirements
+7. Run ```install.sh``` to install all necessary prerequirements
 
                 chmod +X install.sh
                 ./install.sh
 
-7. Reboot to autostart robot or run ```appstart.sh``` to start the robot
+8. Reboot to autostart robot or run ```appstart.sh``` to start the robot
 
-8. Robot moves when ArUco marker 0/1 is detected by Pi Camera
+9.  Robot moves when ArUco marker 0/1 is detected by Pi Camera
