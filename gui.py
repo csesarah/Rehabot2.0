@@ -224,11 +224,11 @@ class appGUI(object):
         self.sensitivity_level_label = tk.Label(root, textvariable=self.sensitivity_level_val, \
                                        bg=background_color, font = font.Font(family=font_family, size=int(4*font_size)))
 
-        #### Display Sensitivity Level Label
+        #### Sensitivity Level Description
         self.sensitivity_desc_val = tk.StringVar()
         self.sensitivity_desc_val.set(global_params.gui_lang["sensitivity_desc"])
         self.sensitivity_desc_label = tk.Label(root, textvariable=self.sensitivity_desc_val, \
-                                       bg=background_color, font = font.Font(family=font_family, size=int(0.8*font_size)))
+                                       bg=background_color, font = font.Font(family=font_family, size=font_size))
 
         #### Select Language 1 Button
         self.language_1_button_photo = btnImage('./rsc/img/1x1.png', 10)
